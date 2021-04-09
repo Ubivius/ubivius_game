@@ -1,8 +1,10 @@
 ﻿using Assets.Scripts.Pathfinding;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ubv.common.world;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace ubv.server.logic
 {
@@ -21,9 +23,16 @@ namespace ubv.server.logic
 
         private bool m_setUpDone = false;
 
+        public UnityAction OnPathFindingManagerGenerated;
+
         private void Start()
         {
             m_worldGenerator.OnWorldGenerated += OnWorldGenerated;            
+        }
+
+        public PathNode[,] GetPathNodeArray()
+        {
+            return m_pathNodes;
         }
 
         private void OnWorldGenerated()
@@ -67,6 +76,8 @@ namespace ubv.server.logic
 
             m_pathfinding = new Pathfinding(pathNodeList);
             m_setUpDone = true;
+
+            OnPathFindingManagerGenerated?.Invoke();
         }
 
         public bool IsSetUpDone()
@@ -74,11 +85,14 @@ namespace ubv.server.logic
             return m_setUpDone;
         }
 
-        public PathNode GetNode(int x, int y)
+        public PathNode GetNode(float x, float y)
         {
-            if (x >= 0 && y >= 0 && x < m_logicGrid.Width && y < m_logicGrid.Height)
+            int xi = Mathf.RoundToInt(x);
+            int yi = Mathf.RoundToInt(y);
+
+            if (xi >= 0 && yi >= 0 && xi < m_logicGrid.Width && yi < m_logicGrid.Height)
             {
-                return m_pathNodes[x, y];
+                return m_pathNodes[xi, yi];
             }
 
             return null;
@@ -142,10 +156,18 @@ namespace ubv.server.logic
             }
         }
 
-        private PathNode GetNodeIfWalkable(int x, int y)
+        public PathNode GetNodeIfWalkable(float x, float y)
         {
-            common.world.cellType.LogicCell cell = m_logicGrid.Grid[x, y];
-            return cell != null ? (cell.IsWalkable ? GetNode(x, y) : null) : null;
+            int xi = Mathf.RoundToInt(x);
+            int yi = Mathf.RoundToInt(y);
+
+            if (xi >= 0 && yi >= 0 && xi < m_logicGrid.Width && yi < m_logicGrid.Height)
+            {
+                common.world.cellType.LogicCell cell = m_logicGrid.Grid[xi, yi];
+                return cell != null ? (cell.IsWalkable ? GetNode(xi, yi) : null) : null;
+            }
+
+            return null;
         }
 
         public List<PathNode> GetPath(PathNode startNode, PathNode endNode)
@@ -157,8 +179,8 @@ namespace ubv.server.logic
 
         public PathRoute GetPathRoute(Vector2 start, Vector2 end)
         {
-            PathNode startNode = this.GetNode(Mathf.RoundToInt(start.x), Mathf.RoundToInt(start.y));
-            PathNode endNode = this.GetNode(Mathf.RoundToInt(end.x), Mathf.RoundToInt(end.y));
+            PathNode startNode = this.GetNode(start.x, start.y);
+            PathNode endNode = this.GetNode(end.x, end.y);
 
             List<PathNode> pathNodeList = this.GetPath(startNode, endNode);
 
