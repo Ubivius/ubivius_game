@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ master, main ]
   push:
-    branches: [ master, main, origin/hotfix/UBI-348-Add-game-tests ]
+    branches: [ master, main, hotfix/UBI-348-Add-game-tests ]
 
 env:
   DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
