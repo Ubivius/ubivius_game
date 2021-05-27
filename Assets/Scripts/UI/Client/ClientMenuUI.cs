@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace ubv.ui.client
 {
-    public class ClientMenuUI : MonoBehaviour
+    public class ClientMenuUI : TabBehaviour
     {
         [SerializeField] private string m_gameSearchScene;
 

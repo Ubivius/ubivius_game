@@ -5,7 +5,7 @@ using TMPro;
 
 namespace ubv.ui.client
 {
-    public class ClientLoginUI : MonoBehaviour
+    public class ClientLoginUI : TabBehaviour
     {
         [SerializeField] private ubv.client.logic.ClientSyncLogin m_lobby;
 
